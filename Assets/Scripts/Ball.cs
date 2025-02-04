@@ -11,6 +11,7 @@ public class Ball : MonoBehaviour
 {
     float speed = 30.0f;
     float touchspeed = 200.0f;
+    float tempSpeed;
 
     public Camera mainCamera; // Reference to the main camera
     public float yPosition = 0f; // Fixed y position for the ball
@@ -35,7 +36,10 @@ public class Ball : MonoBehaviour
     private Renderer ballRenderer;
 
     public string statisticName = "HighScore"; // Name of the statistic used for the leaderboard
-
+    public bool isPaused;
+    public TMP_Text ThreeTwoOneTxt;
+    public GameObject pauseBtn;
+    
     private void Start()
     {
         StartCoroutine(ActiveTutPanel(2.9f));
@@ -43,6 +47,9 @@ public class Ball : MonoBehaviour
         initialPosition = transform.position;
         ballRenderer = GetComponent<Renderer>();
         FetchHighScoreFromPlayFab();
+        isPaused = false;
+        ThreeTwoOneTxt.gameObject.SetActive(false);
+        pauseBtn.SetActive(false);
     }
 
     // Update is called once per frame
@@ -115,8 +122,11 @@ public class Ball : MonoBehaviour
     IEnumerator MovingForward(float delay) 
     {
         yield return new WaitForSeconds(delay);
-        speed += 0.01f;
-        transform.position += new Vector3(0, 0, 1.0f) * speed * Time.deltaTime;
+        if (!isPaused) 
+        {
+            speed += 0.01f;
+            transform.position += new Vector3(0, 0, 1.0f) * speed * Time.deltaTime;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -162,6 +172,7 @@ public class Ball : MonoBehaviour
     {
         yield return new WaitForSeconds(del);
         tutorialPanel.gameObject.SetActive(false);
+        pauseBtn.SetActive(true);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -228,16 +239,59 @@ public class Ball : MonoBehaviour
 
     public void PauseBtn() 
     {
-        Time.timeScale = 0.0f;
+        //Time.timeScale = 0.0f;
+        tempSpeed = speed;
+        speed = 0;
         pausePanel.SetActive(true);
         scorePanel.SetActive(false);
+        isPaused = true;
     }
 
     public void ResumeBtn() 
     {
-        Time.timeScale = 1.0f;
+        //Time.timeScale = 1.0f;
+        speed = tempSpeed;
         pausePanel.SetActive(false);
         scorePanel.SetActive(true);
+        ThreeTwoOneTxt.gameObject.SetActive(true);
+        ThreeTwoOneTxt.text = "3";
+        StartCoroutine(Two(1.0f));
+        //StartCoroutine(Three(2.0f));
+        //StartCoroutine(Three(3.0f));
+        StartCoroutine(Resumenow(3.0f));
+    }
+
+    IEnumerator Resumenow(float del) 
+    {
+        yield return new WaitForSeconds(del);   
+        isPaused = false;
+        ThreeTwoOneTxt.gameObject.SetActive(false);
+    }
+
+    public bool GamePaused() 
+    {
+        //resumetimer = 3;
+        //ThreeTwoOneTxt.text = resumetimer.ToString();
+        return isPaused;
+    }
+
+    
+    IEnumerator Two(float del) 
+    {
+        yield return new WaitForSeconds(del);
+        ThreeTwoOneTxt.text = "2";
+        StartCoroutine(One(1.0f));
+    }
+    IEnumerator One(float del) 
+    {
+        yield return new WaitForSeconds(del);
+        ThreeTwoOneTxt.text = "1";
+        StartCoroutine(GoDisable(1.0f));
+    }
+    IEnumerator GoDisable(float del) 
+    {
+        yield return new WaitForSeconds(del);
+        ThreeTwoOneTxt.gameObject.SetActive(false);
     }
 
     

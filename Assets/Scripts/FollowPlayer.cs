@@ -7,6 +7,7 @@ public class FollowPlayer : MonoBehaviour
     public Animator cameraAnimator;
     float speed = 30.0f;
     bool moveRight;
+    public Ball ball;
 
     //public Cube cb;
 
@@ -24,21 +25,21 @@ public class FollowPlayer : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         cameraAnimator.enabled = false;
-        speed += 0.01f;
-       // if (cb.hit == false) {}
-        if (moveRight)
+        if (!ball.GamePaused()) 
+        {
+            speed += 0.01f;
+        }
+        // if (cb.hit == false) {}
+        if (moveRight && !ball.GamePaused())
         {
             transform.position += new Vector3(0, 0, 1.0f) * speed * Time.deltaTime;
         }
-        else 
-        {
-            transform.position += new Vector3(-1.0f, 0, 0) * speed * Time.deltaTime;
-        }
+        //else{  transform.position += new Vector3(-1.0f, 0, 0) * speed * Time.deltaTime;}
     }
 
-    public void SetMoveRight(bool right) 
+    public void SetMoveRight(bool right)
     {
-        moveRight=right;
+        moveRight = right;
     }
 
 }
