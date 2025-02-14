@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using PlayFab;
 using PlayFab.ClientModels;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class Ball : MonoBehaviour
 {
@@ -46,10 +47,22 @@ public class Ball : MonoBehaviour
         StartCoroutine(DeactivateTutPanel(5.0f));
         initialPosition = transform.position;
         ballRenderer = GetComponent<Renderer>();
-        FetchHighScoreFromPlayFab();
         isPaused = false;
         ThreeTwoOneTxt.gameObject.SetActive(false);
         pauseBtn.SetActive(false);
+
+#if UNITY_ANDROID
+           
+        FetchHighScoreFromPlayFab();
+
+#elif UNITY_WEBGL
+        // Retrieve High Score
+        highscore = PlayerPrefs.GetInt("HighScore", 0);
+        Debug.Log("High Score: " + highscore);
+
+        //OnLoginWebGLSuccess(highscore);
+#endif
+
     }
 
     // Update is called once per frame
@@ -142,7 +155,10 @@ public class Ball : MonoBehaviour
             {
                 highscore = (int)scoreval;
                 Debug.Log("New HighScore: " + highscore);
-                UpdateHighScoreInPlayFab(highscore); // Update high score in PlayFab
+                // UpdateHighScoreInPlayFab(highscore); // Update high score in PlayFab
+                PlayerPrefs.SetInt("HighScore", highscore);
+                PlayerPrefs.Save();
+                Debug.Log("New High Score Saved: " + highscore);
             }
         }
     }

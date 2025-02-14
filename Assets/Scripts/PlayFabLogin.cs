@@ -49,12 +49,19 @@ public class PlayFabLogin : MonoBehaviour
         {
             LoadingPanel.SetActive(false);
         }
-            // var request = new LoginWithCustomIDRequest { CustomId = "GettingStartedGuide", CreateAccount = true };
-            // PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
+        // var request = new LoginWithCustomIDRequest { CustomId = "GettingStartedGuide", CreateAccount = true };
+        // PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
 
 #if UNITY_ANDROID
             var requestAndroid = new LoginWithAndroidDeviceIDRequest { AndroidDeviceId = ReturnMobileID(), CreateAccount = true };
         PlayFabClientAPI.LoginWithAndroidDeviceID(requestAndroid, OnLoginAndroidSuccess, OnLoginAndroidFailure);
+
+#elif UNITY_WEBGL
+        // Retrieve High Score
+         highscore = PlayerPrefs.GetInt("HighScore", 0);
+        Debug.Log("High Score: " + highscore);
+
+        OnLoginWebGLSuccess(highscore);
 #endif
     }
 
@@ -91,6 +98,18 @@ public class PlayFabLogin : MonoBehaviour
     {
         Debug.Log(error.GenerateErrorReport());
 
+    }
+
+    void OnLoginWebGLSuccess(int highScore)
+    {
+        Debug.Log("WebGL Login Successful!");
+        //Debug.Log("Player Name: " + playerName);
+        Debug.Log("High Score: " + highScore);
+
+        // Update UI if you have text fields to show name & high score
+        //playerNameText.text = playerName;
+        HighScoreTxt.text =  highScore.ToString();
+        LoadingPanel.SetActive(false);
     }
 
     public static string ReturnMobileID() 
